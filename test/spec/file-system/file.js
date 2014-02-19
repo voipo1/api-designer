@@ -185,4 +185,62 @@ describe('RAML.FileSystem.File', function() {
       });
     });
   });
+
+  describe('saving metadata', function() {
+    beforeEach(function() {
+      this.deferred = defer();
+      this.sandbox.stub(this.fileSystem, 'save').returns(this.deferred.promise);
+      this.file = File.create(this.parent, '/file.raml', '', { dirty: false });
+
+      this.metaSavePromise = this.file.saveMeta({ key: 'value' });
+    });
+
+    it('delegates to the file system', function() {
+      this.fileSystem.save.should.have.been.calledWith(this.file.path + '.meta', JSON.stringify({ key: 'value' }));
+    });
+
+    describe('on success', function() {
+      beforeEach(function(done) {
+        this.metaSavePromise.then(function(metaFile) {
+          this.metaFile = metaFile;
+        }.bind(this)).then(done);
+
+        this.deferred.resolve();
+        digest();
+      });
+
+      it('yields the file', function() {
+        this.metaFile.path.should.eql(this.file.path + '.meta');
+      });
+    });
+  });
+
+  describe('loading metadata', function() {
+    beforeEach(function() {
+      this.deferred = defer();
+      this.sandbox.stub(this.fileSystem, 'load').returns(this.deferred.promise);
+      this.file = File.create(this.parent, '/file.raml', '', { dirty: false });
+
+      this.metaLoadPromise = this.file.loadMeta();
+    });
+
+    it('delegates to the file system', function() {
+      this.fileSystem.load.should.have.been.calledWith(this.file.path + '.meta');
+    });
+
+    describe('on success', function() {
+      beforeEach(function(done) {
+        this.metaLoadPromise.then(function(metaFile) {
+          this.metaFile = metaFile;
+        }.bind(this)).then(done);
+
+        this.deferred.resolve();
+        digest();
+      });
+
+      it('yields the file', function() {
+        this.metaFile.path.should.eql(this.file.path + '.meta');
+      });
+    });
+  });
 });

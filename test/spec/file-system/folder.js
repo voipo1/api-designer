@@ -58,6 +58,7 @@ describe('RAML.FileSystem.Folder', function() {
         this.contents = [
           { path: path + 'beta.raml', contents: 'my contents', type: 'file', meta: { created: 0 } },
           { path: path + 'alpha.raml', contents: '', type: 'file', meta: { created: 1 } },
+          { path: path + 'alpha.raml.meta', contents: '', type: 'file', meta: { created: 1 } },
           { path: path + 'beta/', type: 'folder', meta: { created: 2 } },
           { path: path + 'alpha/', type: 'folder', meta: { created: 3 } }
         ];
@@ -74,6 +75,10 @@ describe('RAML.FileSystem.Folder', function() {
       it('sorts folders', function() {
         var folderNames = this.folder.folders.map(function(folder) { return folder.name; });
         folderNames.should.eql(['alpha', 'beta']);
+      });
+
+      it('filters out meta files', function() {
+        this.folder.files.map(function(file) { return file.path; }).should.not.include(path + 'alpha.raml.meta');
       });
 
       it('separates files', function() {
@@ -137,7 +142,7 @@ describe('RAML.FileSystem.Folder', function() {
         });
 
         it('retains the new folder', function() {
-          this.folder.folders.should.include(this.newFolder);
+          this.folder.folders.length.should.eql(1);
         });
       });
 

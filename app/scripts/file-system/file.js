@@ -54,6 +54,16 @@
       return storage.load(file.path).then(returnFile, handleErrorFor(file));
     };
 
+    RamlFile.prototype.saveMeta = function(meta) {
+      var metaFile = new RamlFile(this.path + '.meta', JSON.stringify(meta));
+      return metaFile.save();
+    };
+
+    RamlFile.prototype.loadMeta = function() {
+      var metaFile = new RamlFile(this.path + '.meta');
+      return metaFile.load();
+    };
+
     return {
       create: function(parent, path, contents, options) {
         var file = new RamlFile(path, contents, options);

@@ -38,11 +38,15 @@
       };
     }
 
+    function notMetaFile(file) {
+      return file.path.slice(-5) !== '.meta';
+    }
+
     function RamlFolder(meta, contents) {
       this.meta = meta;
 
       var parent = this, separated = separateContents(contents);
-      this.files = separated.file.map(function(file) {
+      this.files = separated.file.filter(notMetaFile).map(function(file) {
         file.meta = file.meta || {};
         file.meta.dirty = false;
         file.meta.persisted = true;

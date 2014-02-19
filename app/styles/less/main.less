@@ -120,22 +120,27 @@ div[role=flexColumns] {
   flex: 1;
 }
 
-div[role=editor] {
-  box-sizing: border-box;
-
-  transition: padding-bottom .05s ease-in;
-  background: rgb(11,11,13);
-
-  position: relative;
+.editorContainer {
   display: flex;
 
   flex-direction: column;
-
   flex: 1;
 }
 
+div[role=editor] {
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  transition: padding-bottom .05s ease-in;
+  background: rgb(11,11,13);
+}
+
 div[role=editor].error {
-  box-shadow: 0 0 5px 1px red;
+  border: solid 1px red;
   transition: all .5s ease-out;
   z-index: 4;
 }
