@@ -39,7 +39,7 @@
           scope.$apply(function() {
             scope.opened = false;
 
-            $window.removeEventListener('click', close);
+            $window.removeEventListener('click', close, true);
             $window.removeEventListener('keydown', closeOnEscape);
           });
 
@@ -58,19 +58,20 @@
 
         var contextMenuController = {
           open: function(event, actions, closeCallback) {
-            event.stopPropagation();
             scroll.disable();
             scope.actions = actions;
 
-            // on close and stpp propagation
+            // on close and stop propagation
             if (onClose) {
               onClose();
             }
             onClose = closeCallback;
 
             positionMenu(element, event.target);
-            $window.addEventListener('click', close);
-            $window.addEventListener('keydown', closeOnEscape);
+            setTimeout(function() {
+              $window.addEventListener('click', close, true);
+              $window.addEventListener('keydown', closeOnEscape);
+            });
 
             scope.opened = true;
           }
