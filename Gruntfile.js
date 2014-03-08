@@ -237,6 +237,15 @@ module.exports = function (grunt) {
             cwd: '<%= yeoman.app %>/vendor/font/',
             dest: '<%= yeoman.dist %>/font/',
             src: ['*']
+          },
+          {
+            expand: true,
+            flatten: true,
+            dot: true,
+            dest: '<%= yeoman.dist %>/authentication',
+            src: [
+              'bower_components/api-console/dist/authentication/*'
+            ]
           }
         ]
       }
