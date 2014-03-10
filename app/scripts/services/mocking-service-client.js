@@ -5,7 +5,7 @@ angular.module('ramlEditorApp')
     var self = this;
 
     self.proxy = null;
-    self.host  = 'http://mocksvc.mulesoft.com';
+    self.host  = 'http://ec2-54-204-170-95.compute-1.amazonaws.com:8080';
     self.base  = '/mocks';
 
     self.buildURL = function buildURL() {
