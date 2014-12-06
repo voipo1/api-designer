@@ -31,38 +31,6 @@
       $scope.importing = false;
       $scope.rootDirectory = ramlRepository.getByPath('/');
 
-      $scope.options = [
-        { name: '.zip file', type: 'file' },
-        { name: 'Swagger spec', type: 'swagger' }
-      ];
-
-      $scope.mode = $scope.options[0];
-
-      // Check whether file import is supported.
-      $scope.fileSupported = !!(
-        window.File && window.FileReader && window.FileList && window.Blob
-      );
-
-      /**
-       * Import using either import modes.
-       *
-       * @param {Object} form
-       */
-      $scope.import = function (form) {
-        form.$submitted      = true;
-        $scope.submittedMode = $scope.mode;
-
-        if (form.$invalid || $scope.importing) {
-          return;
-        }
-
-        if ($scope.mode.type === 'swagger') {
-          return importSwagger($scope.mode);
-        }
-
-        return importFile($scope.mode);
-      };
-
       /**
        * Import files from the local filesystem.
        *
@@ -79,7 +47,7 @@
 
         $scope.importing = true;
 
-        return importService.mergeFileList($scope.rootDirectory, mode.value)
+        return importService.mergeFile($scope.rootDirectory, mode.value)
           .then(function () {
             return $modalInstance.close(true);
           })
@@ -124,6 +92,73 @@
             $scope.importing = false;
           });
       }
+
+      function importSwaggerZip (mode) {
+        $scope.importing = true;
+
+        return swaggerToRAML.zip(mode.value)
+          .then(function (contents) {
+            var filename = extractFileName(mode.value.name, 'raml');
+
+            return importService.createFile(
+              $scope.rootDirectory, filename, contents
+            );
+          })
+          .then(function () {
+            return $modalInstance.close(true);
+          })
+          .catch(function (err) {
+            $rootScope.$broadcast('event:notification', {
+              message: 'Failed to parse Swagger: ' + err.message,
+              expires: true,
+              level: 'error'
+            });
+          })
+          .finally(function () {
+            $scope.importing = false;
+          });
+      }
+
+      $scope.options = [
+        {
+          name: '.zip file',
+          type: 'zip',
+          callback: importFile
+        },
+        {
+          name: 'Swagger spec',
+          type: 'swagger',
+          callback: importSwagger
+        },
+        {
+          name: 'Swagger .zip',
+          type: 'zip',
+          callback: importSwaggerZip
+        }
+      ];
+
+      $scope.mode = $scope.options[0];
+
+      // Check whether file import is supported.
+      $scope.fileSupported = !!(
+        window.File && window.FileReader && window.FileList && window.Blob
+      );
+
+      /**
+       * Import using either import modes.
+       *
+       * @param {Object} form
+       */
+      $scope.import = function (form) {
+        form.$submitted      = true;
+        $scope.submittedType = $scope.mode.type;
+
+        if (form.$invalid || $scope.importing) {
+          return;
+        }
+
+        return $scope.mode.callback($scope.mode);
+      };
 
       /**
        * Extract a useable filename from a path.
